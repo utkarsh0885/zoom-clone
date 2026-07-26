@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@theme {
+  /* Zoom brand colors — matched from Zoom Desktop 2024 */
+  --color-zoom-blue: #0E72ED;
+  --color-zoom-blue-hover: #0B5FCA;
+  --color-zoom-blue-light: #2D8CFF;
+
+  /* Dark theme surfaces — matched from Zoom Desktop dark mode */
+  --color-zoom-dark-bg: #0E0E16;
+  --color-zoom-dark-surface: #17171F;
+  --color-zoom-dark-elevated: #1E1E28;
+  --color-zoom-dark-sidebar: #111119;
+  --color-zoom-dark-border: #232330;
+  --color-zoom-dark-border-light: #2E2E3E;
+  --color-zoom-dark-hover: #1E1E2A;
+
+  /* Text colors — Zoom uses high contrast white with muted gray */
+  --color-zoom-text: #E6E6EB;
+  --color-zoom-text-muted: #7C7C8D;
+  --color-zoom-text-dim: #4E4E5E;
+
+  /* Status colors — matched from Zoom */
+  --color-zoom-green: #2D8C3C;
+  --color-zoom-orange: #E36E2D;
+  --color-zoom-purple: #7B61FF;
+  --color-zoom-red: #E53935;
+
+  /* Legacy compat */
+  --color-zoom-bg: #0E0E16;
+  --color-zoom-surface: #17171F;
+  --color-zoom-text-primary: #E6E6EB;
+  --color-zoom-text-secondary: #7C7C8D;
+
+  /* Radius — Zoom uses 8px for cards, 6px for buttons */
+  --radius-zoom-card: 8px;
+  --radius-zoom-btn: 6px;
+}
+
+@layer base {
+  :root {
+    --background: var(--color-zoom-dark-bg);
+    --foreground: var(--color-zoom-text);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    @apply antialiased;
+  }
+
+  /* Dark scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-zoom-dark-border);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-zoom-dark-border-light);
+  }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   React Day Picker v10 — Dark Theme + Layout
+   ═══════════════════════════════════════════ */
+
+.rdp-root {
+  --rdp-accent-color: var(--color-zoom-blue) !important;
+  --rdp-accent-background-color: rgba(14, 114, 237, 0.15) !important;
+  color: var(--color-zoom-text) !important;
+  width: 100%;
+  font-size: 0.8125rem;
+}
+
+.rdp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.rdp-button_previous,
+.rdp-button_next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--color-zoom-text-muted) !important;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.12s;
+  flex-shrink: 0;
+}
+
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background-color: var(--color-zoom-dark-hover);
+}
+
+.rdp-button_previous:focus-visible,
+.rdp-button_next:focus-visible {
+  outline: 2px solid var(--color-zoom-blue);
+  outline-offset: 1px;
+}
+
+.rdp-chevron {
+  fill: var(--color-zoom-text-muted) !important;
+  width: 14px;
+  height: 14px;
+}
+
+.rdp-month_caption,
+.rdp-caption_label {
+  color: var(--color-zoom-text) !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdp-weekdays {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  margin-bottom: 2px;
+}
+
+.rdp-weekday {
+  color: var(--color-zoom-text-dim) !important;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.rdp-weeks {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rdp-week {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+}
+
+.rdp-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+}
+
+.rdp-day button,
+.rdp-day_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px !important;
+  color: var(--color-zoom-text) !important;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  transition: background 0.12s, color 0.12s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.rdp-day_button:hover {
+  background-color: var(--color-zoom-dark-hover) !important;
+}
+
+.rdp-day_button:focus-visible {
+  outline: 2px solid var(--color-zoom-blue);
+  outline-offset: 1px;
+}
+
+.rdp-selected .rdp-day_button,
+.rdp-day.rdp-selected .rdp-day_button {
+  background-color: var(--color-zoom-blue) !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--color-zoom-blue-light) !important;
+  font-weight: 600;
+}
+
+.rdp-disabled .rdp-day_button {
+  color: var(--color-zoom-text-dim) !important;
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rdp-outside .rdp-day_button {
+  opacity: 0.2;
+}
+
+/* Animation keyframes */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--color-zoom-dark-elevated) 25%, var(--color-zoom-dark-border) 50%, var(--color-zoom-dark-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
