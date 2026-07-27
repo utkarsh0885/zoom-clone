@@ -15,11 +15,14 @@ import { Meeting, Participant } from "@/types/meeting";
 import { toast } from "sonner";
 import { cn, getInviteLink } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
 export default function MeetingRoom() {
   const params = useParams();
   const router = useRouter();
   const meetingId = params?.meeting_id as string | undefined;
+  const { user } = useAuth();
+  const [myDisplayName, setMyDisplayName] = React.useState<string>("");
 
   const [meeting, setMeeting] = React.useState<Meeting | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -53,6 +56,27 @@ export default function MeetingRoom() {
         setMeeting(data);
         setLocalParticipants(data.participants || []);
         setCurrentHost(data.host_name);
+
+        // Determine local user's display name
+        let name = "Guest User";
+        if (typeof window !== "undefined") {
+          const savedName = localStorage.getItem(`meeting_display_name_${data.meeting_id}`);
+          if (savedName) {
+            name = savedName;
+          } else if (user) {
+            name = user.full_name;
+          }
+        } else if (user) {
+          name = user.full_name;
+        }
+        setMyDisplayName(name);
+
+        // If I am the creator or have the host_of localStorage flag, make sure my display name matches host_name if applicable
+        const isHostCreator = (data.created_by && user && data.created_by === user.id) ||
+                            (typeof window !== "undefined" && localStorage.getItem(`host_of_${data.meeting_id}`) === "true");
+        if (isHostCreator) {
+          setMyDisplayName(data.host_name);
+        }
       } catch (err) {
         console.error("Fetch meeting error:", err);
         setError("Failed to connect to the meeting. It may not exist.");
@@ -62,7 +86,7 @@ export default function MeetingRoom() {
       }
     }
     fetchMeeting();
-  }, [meetingId]);
+  }, [meetingId, user]);
 
   const copyInviteLink = () => {
     if (meeting?.meeting_id) {
@@ -202,7 +226,7 @@ export default function MeetingRoom() {
     );
   }
 
-  const isCurrentUserHost = currentHost === meeting.host_name;
+  const isCurrentUserHost = myDisplayName === currentHost;
   const filteredParticipants = localParticipants.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -258,13 +282,13 @@ export default function MeetingRoom() {
             </div>
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-b from-[#1a1a1a] to-[#111]">
-              <Avatar fallback={meeting.host_name.substring(0, 2).toUpperCase()} size="lg" className="h-24 w-24 text-2xl bg-zoom-blue/20 text-zoom-blue-light border-2 border-zoom-blue/20" />
-              <p className="text-gray-500 text-sm mt-3">{meeting.host_name}</p>
+              <Avatar fallback={(myDisplayName || "G").substring(0, 2).toUpperCase()} size="lg" className="h-24 w-24 text-2xl bg-zoom-blue/20 text-zoom-blue-light border-2 border-zoom-blue/20" />
+              <p className="text-gray-500 text-sm mt-3">{myDisplayName}</p>
             </div>
           )}
 
           <div className="absolute bottom-4 left-4 rounded-lg bg-black/50 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-xl flex items-center gap-2 border border-white/5">
-            {meeting.host_name} 
+            {myDisplayName} 
             {isCurrentUserHost ? (
               <span className="bg-zoom-blue/20 text-zoom-blue-light text-[10px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">Host, You</span>
             ) : (
@@ -386,18 +410,18 @@ export default function MeetingRoom() {
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 mt-4 space-y-2 min-h-[200px] no-scrollbar">
-            {/* Self - Only show if matches search */}
-            {(meeting.host_name.toLowerCase().includes(searchQuery.toLowerCase())) && (
+            {/* Host - Only show if matches search */}
+            {(currentHost.toLowerCase().includes(searchQuery.toLowerCase())) && (
               <div className="flex items-center justify-between group py-2 px-3 rounded-xl hover:bg-zoom-dark-hover transition-colors">
                 <div className="flex items-center gap-3">
-                  <Avatar fallback={meeting.host_name.substring(0,2).toUpperCase()} className="h-9 w-9 sm:h-10 sm:w-10 bg-zoom-blue text-white text-xs sm:text-sm font-medium" />
+                  <Avatar fallback={(currentHost || "H").substring(0,2).toUpperCase()} className="h-9 w-9 sm:h-10 sm:w-10 bg-zoom-blue text-white text-xs sm:text-sm font-medium" />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-zoom-text flex items-center gap-2">
-                      {meeting.host_name} 
-                      {isCurrentUserHost ? (
+                      {currentHost} 
+                      {myDisplayName === currentHost ? (
                         <span className="bg-zoom-blue/15 text-zoom-blue-light text-[9px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">Host, You</span>
                       ) : (
-                        <span className="bg-white/10 text-gray-400 text-[9px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">You</span>
+                        <span className="bg-zoom-blue/15 text-zoom-blue-light text-[9px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">Host</span>
                       )}
                     </span>
                   </div>
@@ -405,26 +429,26 @@ export default function MeetingRoom() {
                 <div className="flex gap-2 text-zoom-text-dim">
                    <Mic className="h-4 w-4" />
                    <Video className="h-4 w-4" />
-                </div>
+                 </div>
               </div>
             )}
             
             {/* Other Participants */}
-            {filteredParticipants.map((p) => (
+            {filteredParticipants.filter(p => p.name !== currentHost).map((p) => (
               <div key={p.id} className="flex items-center justify-between group py-2 px-3 rounded-xl hover:bg-zoom-dark-hover transition-colors">
                 <div className="flex items-center gap-3">
                   <Avatar fallback={p.name.substring(0,2).toUpperCase()} className="h-9 w-9 sm:h-10 sm:w-10 bg-zoom-dark-elevated text-zoom-text-muted text-xs sm:text-sm font-medium border border-zoom-dark-border" />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-zoom-text flex items-center gap-2">
                       {p.name} 
-                      {currentHost === p.name && (
-                        <span className="bg-zoom-blue/15 text-zoom-blue-light text-[9px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">Host</span>
+                      {myDisplayName === p.name && (
+                        <span className="bg-white/10 text-gray-400 text-[9px] uppercase px-1.5 py-0.5 rounded font-bold tracking-wider">You</span>
                       )}
                     </span>
                   </div>
                 </div>
                 
-                {isCurrentUserHost && currentHost !== p.name && (
+                {isCurrentUserHost && (
                   <div className="flex items-center gap-1">
                     <div className="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity focus-within:opacity-100">
                        <Button 
@@ -451,7 +475,7 @@ export default function MeetingRoom() {
               </div>
             ))}
 
-            {filteredParticipants.length === 0 && !(meeting.host_name.toLowerCase().includes(searchQuery.toLowerCase())) && (
+            {filteredParticipants.filter(p => p.name !== currentHost).length === 0 && !(currentHost.toLowerCase().includes(searchQuery.toLowerCase())) && (
               <div className="flex flex-col items-center justify-center py-8 text-zoom-text-dim">
                 <Users className="h-10 w-10 mb-2 opacity-20" />
                 <p className="text-sm">No participants found</p>

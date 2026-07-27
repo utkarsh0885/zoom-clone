@@ -16,3 +16,6 @@ out/
 # Environment
 .env
 .env.*
+
+# OS-specific
+.DS_Store

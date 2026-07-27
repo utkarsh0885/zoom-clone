@@ -16,5 +16,6 @@ export interface Meeting {
   scheduled_for?: string;
   duration?: number;
   invite_link: string;
+  created_by?: string;
   participants: Participant[];
 }

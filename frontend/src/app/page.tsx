@@ -130,6 +130,10 @@ export default function Home() {
       setIsCreating(true);
       const meeting = await meetingsService.createInstantMeeting();
       toast.success("Meeting created!");
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`host_of_${meeting.meeting_id}`, "true");
+        localStorage.setItem(`meeting_display_name_${meeting.meeting_id}`, meeting.host_name);
+      }
       setCreatedMeeting(meeting);
       setIsSuccessModalOpen(true);
     } catch (error) { console.error(error);
@@ -181,6 +185,10 @@ export default function Home() {
       });
       
       toast.success("Meeting scheduled successfully");
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`host_of_${meeting.meeting_id}`, "true");
+        localStorage.setItem(`meeting_display_name_${meeting.meeting_id}`, meeting.host_name);
+      }
       setIsScheduleModalOpen(false);
       resetSchedule();
       fetchUpcoming(); 
