@@ -17,7 +17,6 @@ A modern Zoom-inspired video conferencing application built with **Next.js, Fast
 ## 📂 GitHub Repository
 
 https://github.com/utkarsh0885/zoom-clone
-https://github.com/utkarsh0885/zoom-clone-frontend
 
 ---
 
