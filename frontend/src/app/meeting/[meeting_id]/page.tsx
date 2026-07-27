@@ -13,7 +13,7 @@ import { Input } from "@/ui/Input";
 import { meetingsService } from "@/services/api";
 import { Meeting, Participant } from "@/types/meeting";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn, getInviteLink } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export default function MeetingRoom() {
@@ -65,8 +65,8 @@ export default function MeetingRoom() {
   }, [meetingId]);
 
   const copyInviteLink = () => {
-    if (meeting?.invite_link) {
-      navigator.clipboard.writeText(meeting.invite_link);
+    if (meeting?.meeting_id) {
+      navigator.clipboard.writeText(getInviteLink(meeting.meeting_id));
       toast.success("Invite link copied to clipboard");
     }
   };

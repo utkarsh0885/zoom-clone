@@ -20,6 +20,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { useAuth } from "@/context/AuthContext";
 import { DashboardLayout } from "@/layout/Navbar";
+import { getInviteLink } from "@/lib/utils";
 
 const joinSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").trim(),
@@ -522,8 +523,8 @@ export default function Home() {
                 </div>
                 <div className="flex justify-between items-center text-sm overflow-hidden gap-2">
                   <span className="text-zoom-text-muted font-medium shrink-0">Invite Link</span>
-                  <span className="text-zoom-blue text-xs font-mono truncate" title={createdMeeting.invite_link}>
-                    {createdMeeting.invite_link}
+                  <span className="text-zoom-blue text-xs font-mono truncate" title={getInviteLink(createdMeeting.meeting_id)}>
+                    {getInviteLink(createdMeeting.meeting_id)}
                   </span>
                 </div>
               </div>
@@ -556,7 +557,7 @@ export default function Home() {
                       variant="outline" 
                       className="flex-1 px-2"
                       onClick={() => {
-                        navigator.clipboard.writeText(createdMeeting.invite_link);
+                        navigator.clipboard.writeText(getInviteLink(createdMeeting.meeting_id));
                         toast.success("Invite Link copied to clipboard");
                       }}
                     >

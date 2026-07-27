@@ -6,6 +6,9 @@ import string
 from sqlalchemy import or_
 from datetime import datetime, timezone
 from typing import Optional
+import os
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 def generate_meeting_id():
     return ''.join(random.choices(string.digits, k=9))
@@ -13,7 +16,7 @@ def generate_meeting_id():
 def create_meeting(db: Session, meeting: MeetingCreate, created_by: Optional[str] = None):
     meeting_id = generate_meeting_id()
     formatted_id = f"{meeting_id[:3]}-{meeting_id[3:6]}-{meeting_id[6:]}"
-    invite_link = f"http://localhost:3000/join/{formatted_id}"
+    invite_link = f"{FRONTEND_URL.rstrip('/')}/join/{formatted_id}"
     
     db_meeting = Meeting(
         **meeting.model_dump(),
@@ -68,7 +71,7 @@ def add_participant(db: Session, meeting_id: str, participant_name: str):
 def schedule_meeting(db: Session, req: ScheduleMeetingRequest, created_by: Optional[str] = None):
     meeting_id = generate_meeting_id()
     formatted_id = f"{meeting_id[:3]}-{meeting_id[3:6]}-{meeting_id[6:]}"
-    invite_link = f"http://localhost:3000/join/{formatted_id}"
+    invite_link = f"{FRONTEND_URL.rstrip('/')}/join/{formatted_id}"
     
     db_meeting = Meeting(
         title=req.title,

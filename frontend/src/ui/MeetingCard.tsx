@@ -11,6 +11,7 @@ import { meetingsService } from "@/services/api";
 import { Skeleton } from "./Skeleton";
 
 import { Meeting } from "@/types/meeting";
+import { getInviteLink } from "@/lib/utils";
 
 interface MeetingCardProps {
   meeting: Meeting;
@@ -26,7 +27,7 @@ export function MeetingCard({ meeting, isRecent = false, onRefresh }: MeetingCar
   
   const handleCopyLink = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    navigator.clipboard.writeText(meeting.invite_link);
+    navigator.clipboard.writeText(getInviteLink(meeting.meeting_id));
     toast.success("Meeting link copied to clipboard");
   };
 
@@ -226,8 +227,8 @@ export function MeetingCard({ meeting, isRecent = false, onRefresh }: MeetingCar
               </div>
               <div className="flex justify-between items-center text-[12px] overflow-hidden">
                 <span className="text-zoom-text-muted font-normal flex-shrink-0">Invite Link</span>
-                <span className="text-zoom-blue text-[11px] font-mono truncate ml-4" title={meeting.invite_link}>
-                  {meeting.invite_link}
+                <span className="text-zoom-blue text-[11px] font-mono truncate ml-4" title={getInviteLink(meeting.meeting_id)}>
+                  {getInviteLink(meeting.meeting_id)}
                 </span>
               </div>
             </div>
